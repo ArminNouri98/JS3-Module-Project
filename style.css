@@ -1,3 +1,79 @@
+/* Global reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+/* Root container styling */
 #root {
-  color: red;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;/* Adjust spacing for vertical alignment */
+  min-height: 100vh; /* Ensures the root covers the full viewport height */
+  padding: 20px; /* Adds spacing around the root container */
+  gap: 10px; /* Creates consistent spacing between children */
+}
+
+
+.container {
+  display: flex;
+  flex-wrap: wrap; /* Fixed syntax */
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Card styling */
+.card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card image styling */
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Card content styling */
+.card-content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-content h3 {
+  font-size: 18px;
+  color: #333;
+}
+
+.card-content p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Link styling */
+.card-content a {
+  text-decoration: none;
+  color: #007BFF;
+  font-weight: bold;
+  margin-top: auto;
+}
+
+.card-content a:hover {
+  text-decoration: underline;
 }
