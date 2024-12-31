@@ -12,7 +12,7 @@ function makePageForEpisodes(episodeList) {
   // Iterate over the list of episodes
   episodeList.forEach((episode) => {
     // Create a container (card) for each episode
-    const card = document.createElement("div");
+    const card = createEpisodeCard(episode);
     card.className = "card"; // Assign a class to the card for styling
 
     // Populate the card with episode details using template literals
@@ -40,5 +40,23 @@ function makePageForEpisodes(episodeList) {
     rootElem.appendChild(card);
   });
 }
+function createEpisodeCard(episode) {
+  const episodeCard = document.createElement("div");
+  episodeCard.classList.add("episode-card");
 
+  // Create episode code
+  const episodeCode = `S${String(episode.season).padStart(2, "0")}E${String(episode.number).padStart(2, "0")}`;
+
+  // Set the inner HTML for the episode card
+  episodeCard.innerHTML = `
+    <img src="${episode.image.medium}" alt="${episode.name}">
+    <div class="card-content">
+      <h3>${episode.name} - ${episodeCode}</h3>
+      <p><strong>Summary:</strong> ${episode.summary}</p>
+      <a href="${episode.url}" target="_blank">More info</a>
+    </div>
+  `;
+
+  return episodeCard;
+}
 window.onload = setup;
