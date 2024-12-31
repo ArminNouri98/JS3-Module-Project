@@ -1,43 +1,88 @@
-//You can edit ALL of the code here
 function setup() {
   const allEpisodes = getAllEpisodes();
+
+  // Populate the episode selector dropdown
+  populateEpisodeSelector(allEpisodes);
+
+  // Render all episodes initially
   makePageForEpisodes(allEpisodes);
+
+  // Add event listeners for search and selector
+  setupEventListeners(allEpisodes);
 }
 
-// Function to render a list of episodes on the page
+function populateEpisodeSelector(allEpisodes) {
+  const selector = document.getElementById("episode-selector");
+
+  selector.innerHTML = '<option value="">All Episodes</option>';
+
+  allEpisodes.forEach((episode) => {
+    const option = document.createElement("option");
+    option.value = episode.id; 
+    option.textContent = `S${String(episode.season).padStart(2, "0")}E${String(episode.number).padStart(2, "0")} - ${episode.name}`;
+    selector.appendChild(option);
+  });
+}
+
 function makePageForEpisodes(episodeList) {
-  // Get the root element where all episodes will be displayed
-  const rootElem = document.getElementById("root");
+  const episodesContainer = document.querySelector(".episodes-container");
 
-  // Iterate over the list of episodes
+  // Clear previous episodes
+  episodesContainer.innerHTML = "";
+
+  // Render each episode
   episodeList.forEach((episode) => {
-    // Create a container (card) for each episode
-    const card = document.createElement("div");
-    card.className = "card"; // Assign a class to the card for styling
+    const card = createEpisodeCard(episode);
+    episodesContainer.appendChild(card);
+  });
 
-    // Populate the card with episode details using template literals
-    card.innerHTML = `
-      <!-- Episode image -->
-      <img src="${episode.image.medium}" alt="${episode.name}">
-      
-      <!-- Content section of the card -->
-      <div class="card-content">
-        <!-- Episode name, season, and episode number -->
-        <h3>${episode.name} - S${String(episode.season).padStart(
-      2,
-      "0"
-    )}E${String(episode.number).padStart(2, "0")}</h3>
-        
-        <!-- Episode summary -->
-        <p>${episode.summary}</p>
-        
-        <!-- Link to more information about the episode -->
-        <a href="${episode.url}" target="_blank">More info</a>
-      </div>
-    `;
+  // Update the info text
+  const infoText = document.getElementById("search-count");
+  infoText.textContent = `Displaying ${episodeList.length} / ${getAllEpisodes().length} episodes`;
+}
 
-    // Append the card to the root element
-    rootElem.appendChild(card);
+function createEpisodeCard(episode) {
+  const episodeCard = document.createElement("div");
+  episodeCard.classList.add("card");
+
+  const episodeCode = `S${String(episode.season).padStart(2, "0")}E${String(episode.number).padStart(2, "0")}`;
+
+  episodeCard.innerHTML = `
+    <img src="${episode.image.medium}" alt="${episode.name}">
+    <div class="card-content">
+      <h3>${episode.name} - ${episodeCode}</h3>
+      <p>${episode.summary}</p>
+      <a href="${episode.url}" target="_blank">More info</a>
+    </div>
+  `;
+
+  return episodeCard;
+}
+
+function setupEventListeners(allEpisodes) {
+  const searchBox = document.getElementById("search-box");
+  const selector = document.getElementById("episode-selector");
+
+  // Search functionality
+  searchBox.addEventListener("input", () => {
+    const query = searchBox.value.toLowerCase();
+    const filteredEpisodes = allEpisodes.filter(
+      (episode) =>
+        episode.name.toLowerCase().includes(query) ||
+        episode.summary.toLowerCase().includes(query)
+    );
+    makePageForEpisodes(filteredEpisodes);
+  });
+
+  // Selector functionality
+  selector.addEventListener("change", () => {
+    const selectedEpisodeId = selector.value;
+    if (selectedEpisodeId) {
+      const selectedEpisode = allEpisodes.find((ep) => ep.id === parseInt(selectedEpisodeId));
+      makePageForEpisodes(selectedEpisode ? [selectedEpisode] : []);
+    } else {
+      makePageForEpisodes(allEpisodes);
+    }
   });
 }
 
