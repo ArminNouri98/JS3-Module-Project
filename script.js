@@ -1,14 +1,34 @@
-function setup() {
-  const allEpisodes = getAllEpisodes();
+async function fetchEpisodes() {
+  try {
+    const response = await fetch('https://api.tvmaze.com/shows/82/episodes');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+}
 
-  // Populate the episode selector dropdown
-  populateEpisodeSelector(allEpisodes);
+async function setup() {
+  try {
+    const allEpisodes = await fetchEpisodes();
+    if (!allEpisodes) {
+      throw new Error('Failed to load episodes');
+    }
 
-  // Render all episodes initially
-  makePageForEpisodes(allEpisodes);
+    // Populate the episode selector dropdown
+    populateEpisodeSelector(allEpisodes);
 
-  // Add event listeners for search and selector
-  setupEventListeners(allEpisodes);
+    // Render all episodes initially
+    makePageForEpisodes(allEpisodes);
+
+    // Add event listeners for search and selector
+    setupEventListeners(allEpisodes);
+  } catch (error) {
+    console.error('There has been a problem with your setup:', error);
+  }
 }
 
 function populateEpisodeSelector(allEpisodes) {
@@ -38,7 +58,7 @@ function makePageForEpisodes(episodeList) {
 
   // Update the info text
   const infoText = document.getElementById("search-count");
-  infoText.textContent = `Displaying ${episodeList.length} / ${getAllEpisodes().length} episodes`;
+  infoText.textContent = `Displaying ${episodeList.length} episodes`;
 }
 
 function createEpisodeCard(episode) {
