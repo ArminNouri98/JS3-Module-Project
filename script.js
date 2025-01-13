@@ -1,6 +1,7 @@
 let allShows = []; // Stores all available shows
 let allEpisodes = []; // Stores episodes for the selected show
 let currentView = "shows"; // Tracks the current view: "shows" or "episodes"
+const cache = {};
 
 // Initialize the app on load
 function setup() {
@@ -94,11 +95,28 @@ function createShowCard(show) {
 // Load episodes for a selected show
 async function loadEpisodes(showId) {
   try {
+    if (cache[showId]) {
+      // Use cached data if it exists
+      allEpisodes = cache[showId];
+      currentView = "episodes";
+      renderEpisodes(allEpisodes);
+      populateEpisodeSelector(allEpisodes);
+      toggleBackButton(true);
+      return; // Skip fetching from the API
+    }
+
+    // Fetch episodes from the API if not in cache
     const response = await fetch(
       `https://api.tvmaze.com/shows/${showId}/episodes`
     );
     if (!response.ok) throw new Error("Failed to fetch episodes.");
-    allEpisodes = await response.json();
+    const episodes = await response.json();
+
+    // Cache the fetched episodes
+    cache[showId] = episodes;
+
+    // Use the fetched data
+    allEpisodes = episodes;
     currentView = "episodes";
     renderEpisodes(allEpisodes);
     populateEpisodeSelector(allEpisodes);
@@ -163,6 +181,13 @@ function populateEpisodeSelector(episodes) {
 // Handle search input dynamically
 function handleSearchInput(query) {
   query = query.toLowerCase();
+
+  // Reset episode selector to "All Episodes"
+  const episodeSelector = document.getElementById("episode-selector");
+  if (currentView === "episodes") {
+    episodeSelector.value = ""; // Reset dropdown to default
+  }
+
   if (currentView === "shows") {
     const filteredShows = allShows.filter(
       (show) =>
@@ -212,8 +237,11 @@ function setupEventListeners() {
   });
 
   backButton.addEventListener("click", () => {
-    renderShows(allShows);
-    toggleBackButton(false);
+    document.getElementById("episode-selector").innerHTML = ""; // Clear episode selector
+    document.getElementById("show-selector").value = ""; // Reset dropdown
+    allEpisodes = []; // Clear episode data
+    renderShows(allShows); // Display all shows
+    toggleBackButton(false); // Hide back button
   });
 }
 
